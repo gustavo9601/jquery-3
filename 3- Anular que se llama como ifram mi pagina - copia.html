@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>jQuery Avanzado</title>
+
+    <!-- Estilo del Boostrap 4 -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/estilo.css">
+
+</head>
+<body>
+
+<h1>Titulo 1</h1>
+<h1>Titulo 2</h1>
+<p>
+    Previniendo que incluyan mi pagina como iframe de otra
+</p>
+
+<!-- Librería de jQuery -->
+<script src="assets/libs/jquery-3.min.js" charset="utf-8"></script>
+
+
+<!--
+Script que debe ir en el documento IFRAME
+-->
+
+<script>
+    //Con este script se reidreccionara a la pagina real y no podran carga la pagina como Iframe
+    if (window != window.top) {
+        window.top = window.location;
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>jQuery Avanzado</title>
+
+    <!-- Estilo del Boostrap 4 -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/estilo.css">
+    <style>
+        #ball {
+            position: fixed;
+            left: 50%;
+            bottom: 500px;
+            opacity: 0;
+            z-index: 1000;
+
+        }
+
+        #caja {
+            width: 100px;
+            height: 100px;
+            background-color: black;
+            display: block;
+            margin-top: 2em;
+        }
+
+        .rectanguloThis {
+            width: 200px;
+            height: 100px;
+            border: 2px dashed black;
+            background-color: red;
+
+        }
+    </style>
+</head>
+<body>
+<h1>Animaciones</h1>
+
+<button id="mostrar" class="btn btn-primary">Mostrar Ball</button>
+<button id="ocultar" class="btn btn-danger">Ocultar Ball</button>
+<div id="caja"></div>
+
+<img id="ball" src="assets/img/ball.png" alt="">
+<hr>
+<button id="btnProxy">Click / Btn Proxy</button>
+<div class="rectanguloThis"></div>
+<hr>
+<input id="input1" style="width:60px;" type="text"/>
+<input id="input2" style="width:60px;" type="text"/>
+<input id="input3" style="width:60px;" type="text"/>
+
+<p class="lipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+
+<p class="lipsum">Aenean dapibus turpis ut justo congue id sodales mi dignissim.</p>
+
+<p class="lipsum">In sed lorem elit, sit amet mollis enim. Integer at feugiat</p>
+
+<p class="lipsum">Integer dignissim, neque eu varius dignissim, risus lacus accum</p>
+
+<p class="lipsum">Proin tempus.</p>
+
+
+<script src="assets/libs/jquery-3.min.js" charset="utf-8"></script>
+<!--Librerira que anima la transmision de cambio de color con jquery-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-color/2.1.2/jquery.color.min.js"></script>
+<script src="js/script.js"></script>
+
+<script>
+    var btnMostrar = $('#mostrar');
+    var btnOcultar = $('#ocultar');
+    var ball = $('#ball');
+
+    /*
+     * .stop()  //detiene la animacion , se previene errores
+     * .animate(
+     * {
+     * // estilos
+     * }
+     * tiempo estimado,
+     * tipo de animacion
+     * )
+     * */
+
+    btnMostrar.on('click', function () {
+        ball.stop().animate({
+            'opacity': 1,
+            'bottom': 0
+        }, 1500, 'swing');
+    });
+
+
+    btnOcultar.on('click', function () {
+        ball.stop().animate({
+            'bottom': 500,
+            'opacity': 0
+        }, 1500, 'swing');
+    });
+
+
+    /*================*/
+    /*CREANDO PROPIEDADES CSS PARA MANIPULARLOS CON JQUERY*/
+    /*================*/
+    var cajita = $('#caja');
+    //$.cssHooks['nombreProdpiedad']  //le espcifica a jquery que es nueva propierdad css
+    $.cssHooks['rotarObjetos'] = {
+        set: function (elementoSeleccionado, valorParametro) { //recibe dos parametros (elelemto, y su valor)
+            $(elementoSeleccionado).css({ //aplicamos los estilos al elemento seleccionado
+                'transform': 'rotate(' + parseInt(valorParametro) + 'deg)'
+            });
+        }
+    };
+
+    //elelmento.css(nuevaPropeidad, valor)
+    cajita.css('rotarObjetos', 100);
+    cajita.animate({'rotarObjetos': 150}, 'slow');
+
+
+    /*================*/
+    /*CAMBIANDO EL APUNTADOR THIS, CON PROYX*/
+    /*================*/
+
+    $('#btnProxy').on('click', $.proxy(function () {  //proxy enciarra a la funcion del evento
+
+            $(this).animate({  //el this pasa a ser el de clase.rectanguloThis y no el btn
+                'background-color': 'blue'
+            }, 1000);
+
+        }, $('.rectanguloThis') // le definimos quien va a hacer el this
+    ));
+
+
+    /*================*/
+    /*PASANDO FUNCIONES CALLBACK A FUNCIONES DE JQUERY*/
+    /*===============*/
+
+    //seleccionamos el elemento
+    // al val en vez de espcificarle elvalor, vamos a retornar que sea cada id del elemento
+    //recorrera todos los input y les colcoara por val su id
+    $('input[type=text]').val(function () {
+        return $(this).attr('id');
+    });
+
+    var p = $('.lipsum');
+
+    //filter permite recorrer una lista de objetos y filtrar lo que le pasemos si la condicion se cumple
+    p.filter(function () {
+        //solo retornara los <P> que no tengan la palabra lorem , con la exprecion regular
+        return $(this).text().match(/lorem/i) != null;
+    }).hide();
+
+    //filtramos en la variable p, todos los parrrafos que esten visibles
+    p = p.filter(':visible');
+
+    //colocaresmos a cada parrafo con repren, un indice,
+    p.prepend(function (index) { //cuando se pasa la funcion , esta jequeyr devuelve el indice  del elemento
+
+        return ( index + 1 ) + ") ";
+
+    });
+
+
+    p.css('color', function (index) { //devuelve el indice
+        // dejara blue los que son pares y los que no los dejara verde
+        return index % 2 == 1 ? 'blue' : 'green';
+
+    });
+
+
+    //funcion que colocara a todos los parrafoss mayores a 40 caracteres ...
+    p.html(function () {
+
+        var contenido = $(this).text();
+
+        if (contenido.length > 40) {
+            return contenido.slice(0, 40) + "...";
+        }
+
+    });
+
+    //mostramos por consola, si el parrafo 3, es , de color verde con la exprecion regular
+    console.log('El primer parrafo en verde?', p.eq(2).is(function () {
+
+        return $(this).css('color').match(/green|rgb\(0, 128, 0\)|#00FF00/i);
+
+    }));
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>jQuery Avanzado</title>
+
+    <!-- Estilo del Boostrap 4 -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/estilo.css">
+    <style>
+        .preload {
+            position: absolute;
+            display: none;
+            text-align: center;
+            margin-top: 10%;
+            width: 100%;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="preload">
+    <img src="assets/img/preloader.gif" alt="">
+</div>
+
+<h1>Archivo de Peticiones Ajax</h1>
+<p id="peticion1"></p>
+<p id="peticion2"></p>
+<p id="peticion3"></p>
+<p id="peticion4"></p>
+<p id="peticion5"></p>
+<p id="peticion6"></p>
+
+<hr>
+
+<form action="" class="form-group" id="formulario1">
+    <input class="form-control" type="text" name="cantante" value="Jesus Adrian Romero">
+    <input class="form-control" type="email" name="email" value="Jesus@gmail.com">
+    <textarea class="form-control" name="datos" id="" cols="30" rows="10">Very Wel</textarea>
+</form>
+<!-- Librería de jQuery -->
+<script src="assets/libs/jquery-3.min.js" charset="utf-8"></script>
+<script>
+
+    /*===========================================================================*/
+    //Preload para todas las peticioens ajax
+    var preload = $('.preload');
+    var doc = $(document);
+
+    /*
+     * ajaxStart, detecta cuando se inician peticiones
+     * */
+    doc.ajaxStart(function () {
+        preload.fadeIn();
+    });
+
+    /*ajaxComplete detecta cuando se completan las peticionez*/
+    doc.ajaxComplete(function () {
+        preload.delay(800).fadeOut();
+    });
+
+
+    /*===========================================================================*/
+    /*
+     * Colocamos cada una de las url de arhicovs que necesitamos el dato
+     * */
+    $.when($.get('assets/data/1.json'), $.get('assets/data/2.json'))
+    /*Recibo una respuesta por cada archivo que se realizo la opeiticion*/
+        .then(function (r1, r2) {
+
+            r1 = r1[0];
+            r2 = r2[0];
+
+            var mensaje = r1.mensaje + " " + r2.nombre + " " + r2.edad;
+            console.log(mensaje);
+            $('#peticion1').html(mensaje);
+            //Capturamos el error
+        }).catch(function (err) {
+        console.log("error!!!!");
+    })
+
+
+    /*===========================================================================*/
+    //Peticion para obetener la IP publica
+    //Peticion hacia un servidor difernte dominio
+    $.get('https://jsonip.com/', function (respuesta) {
+        console.log(respuesta);
+        $('#peticion2').html("IP Publica Actual = " + respuesta.ip);
+    })
+
+
+    /*===========================================================================*/
+    //cargando infrmacion desde archivo.txt
+    $.get('assets/data/1.txt', function (respuesta) {
+        console.log(respuesta);
+        $('#peticion3').html(respuesta);
+    });
+
+
+    /*===========================================================================*/
+    //cargando informacion de un archivo html
+    //load(url , id o clase que deseamos cargar)
+    $('#peticion4').load('assets/data/1.html #header');
+
+
+    /*===========================================================================*/
+    var formulario1 = $('#formulario1');
+    console.log(formulario1.serialize()); //Captura los datos del formulario, y los escapeado los caracteres convierto en una URL
+    console.log(formulario1.serializeArray());  //Converite en Array los datos del formulario
+    console.log(formulario1.serializeArray());
+
+
+    /*===========================================================================*/
+    //Obtencion del Clima
+    //Desde la URL: https://home.openweathermap.org
+
+    var id = 'b619a1fcfeedc86ffbc66d4d92b50b43';
+    var latitud = '4.595724';
+    var longitud = '-74.170758';
+    var url = 'http://api.openweathermap.org/data/2.5/weather?lat=' + latitud + '&lon=' + longitud + '&appid=' + id;
+
+    $.get(url, function (respuesta) {
+        console.log(respuesta);
+        //imprimismos el resultado de acuerdo a la peticion ajax, //Restammos a ala temprertarua para convertirla en Grados centigrados
+        $('#peticion5').html('Sitio = ' + respuesta.name + " Pais = " + respuesta.sys.country + " Temperatura C = " + Math.round(respuesta.main.temp - 273.15))
+    })
+
+
+    /*===========================================================================*/
+    //Obtencion de ubicacion geografica apartir de la ip
+    var ip = '186.155.15.247';
+    var url2 = 'http://freegeoip.net/json/' + ip + '?callback=';
+
+    $.get(url2, function (respuesta) {
+        console.log(respuesta);
+        $('#peticion6').html("Pais = " + respuesta.country_name + " Ciudad = " + respuesta.region_name);
+    });
+</script>
+
+
+</body>
+</html>
